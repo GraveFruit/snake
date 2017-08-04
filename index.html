@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+<canvas id="myCanvas" width="400" height="400" style="border:0;">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+<script>
+
+    var xdir = 0;
+    var ydir = -1;
+    var snake = [[0, 0]];
+    var fruit = [0, 11];
+    var grid = new Array(20);
+
+    //grid init
+
+    for (var i = 0; i < 20; i++) {
+        grid[i] = new Array(20);
+        for (var j = 0; j < 20; j++) {
+            grid[i][j] = 0;
+        }
+    }
+
+
+    grid[snake[0][0]][snake[0][1]] = 1;
+    grid[fruit[0]][fruit[1]] = 2;
+
+
+    yourloop = setInterval(function () {
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+
+        for (var i = 0; i < 20; i++)
+            for (var j = 0; j < 20; j++) {
+                if (grid[i][j] == 1)
+                    ctx.fillStyle = "#00bc2a";
+                else if (grid[i][j] == 2)
+                    ctx.fillStyle = "#bc2e14";
+                else
+                    ctx.fillStyle = "#e7e9dc";
+                ctx.fillRect(20 * i, 20 * j, 20, 20);
+                ctx.stroke();
+            }
+
+        var snakeHead = snake[0];
+        console.log(snakeHead);
+
+        if (grid[snakeHead[0]][snakeHead[1]]==2){
+            console.log("true");
+            grid[snakeHead[0]][snakeHead[1]]=1;
+            snake.unshift(grid[snakeHead[0]+xdir][snakeHead[1]+ydir]);
+        }
+
+        var snakeTail = snake.pop();
+        if (snakeTail[0] + xdir > 19)
+            snakeTail = [0, snakeTail[1] + ydir];
+        else if (snakeTail[0] + xdir < 0)
+            snakeTail = [19, snakeTail[1] + ydir];
+        else if (snakeTail[1] + ydir > 19)
+            snakeTail = [snakeTail[0] + xdir, 0];
+        else if (snakeTail[1] + ydir < 0)
+            snakeTail = [snakeTail[0] + xdir, 19];
+        else
+            snakeTail = [snakeTail[0] + xdir, snakeTail[1] + ydir];
+        //console.log(snakeTail);
+        snake.unshift(snakeTail);
+
+        for (var i = 0; i < 20; i++) {
+            grid[i] = new Array(20);
+            for (var j = 0; j < 20; j++) {
+                grid[i][j] = 0;
+            }
+        }
+
+        grid[fruit[0]][fruit[1]] = 2;
+
+        for (var k = 0; k < snake.length; k++) {
+            grid[snake[k][0]][snake[k][1]] = 1;
+        }
+
+    }, 200);
+
+
+
+
+</script>
+
+</body>
+</html>
