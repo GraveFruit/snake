@@ -15,9 +15,50 @@
 
     var xdir = 0;
     var ydir = -1;
-    var snake = [[0, 0]];
-    var fruit = [0, 11];
+    var snake = new Array();
+    var fruit = new Array();
     var grid = new Array(20);
+
+
+    document.onkeydown = function (event) {
+        keyCode = window.event.keyCode;
+        keyCode = event.keyCode;
+
+        switch (keyCode) {
+
+            case 37:
+                if (xdir != 1) {
+                    xdir = -1;
+                    ydir = 0;
+                    console.log('left');
+                }
+                break;
+
+            case 39:
+                if (xdir != -1) {
+                    xdir = 1;
+                    ydir = 0;
+                    console.log('right');
+                }
+                break;
+
+            case 38:
+                if (ydir != 1) {
+                    xdir = 0;
+                    ydir = -1;
+                    console.log('up');
+                }
+                break;
+
+            case 40:
+                if (ydir != -1) {
+                    xdir = 0;
+                    ydir = 1;
+                    console.log('down');
+                }
+                break;
+        }
+    }
 
     //grid init
 
@@ -50,12 +91,13 @@
             }
 
         var snakeHead = snake[0];
-        console.log(snakeHead);
 
-        if (grid[snakeHead[0]][snakeHead[1]]==2){
-            console.log("true");
-            grid[snakeHead[0]][snakeHead[1]]=1;
-            snake.unshift(grid[snakeHead[0]+xdir][snakeHead[1]+ydir]);
+        console.log(grid);
+
+        if (snakeHead[0]==fruit[0]&&snakeHead[1]==fruit[1]) {
+            console.log("true "+grid[fruit[0]][fruit[1]]);
+
+            //snake.unshift(grid[snakeHead[0] + xdir][snakeHead[1] + ydir]);
         }
 
         var snakeTail = snake.pop();
@@ -85,12 +127,12 @@
             grid[snake[k][0]][snake[k][1]] = 1;
         }
 
-    }, 200);
-
-
+    }, 1000);
 
 
 </script>
+
+
 
 </body>
 </html>
