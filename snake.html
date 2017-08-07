@@ -11,11 +11,25 @@
 </canvas>
 
 <script>
+    var xdir = 1;
+    var ydir = 0;
+
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
     function minIndex(a) {
         if (a > 0)
             return a;
         else
             return 0;
+    }
+
+    function getInBound(dir){
+        if(dir<0)
+            return 19;
+        else if(dir>19)
+            return 0;
+        else return dir;
     }
 
     function drawFruit(grid, fruit) {
@@ -37,21 +51,35 @@
     }
 
     function moveSnake(snake, xdir, ydir) {
-        for (var i = 0; i < snake.length; i++) {
-            var segment = snake.pop();
-            segment.x += xdir;
-            segment.y += ydir;
-            snake.unshift(segment);
-        }
+
+        var segment = {
+            x: snake[0].x + xdir,
+            y: snake[0].y + ydir
+        };
+        console.log(snake.length);
+
+        if (segment.x < 0)
+            segment.x = 19;
+        if (segment.x > 19)
+            segment.x = 0;
+
+        if (segment.y < 0)
+            segment.y = 19;
+        if (segment.y > 19)
+            segment.y = 0;
+        snake.unshift(segment);
+        snake.pop();
+
+
     }
 
-    function newFruit(fruit, snake, grid, xdir, ydir) {
+    function newFruit(snake, grid, xdir, ydir) {
         var apple = {
             x: Math.floor(Math.random() * 20),
             y: Math.floor(Math.random() * 20)
-        }
-        apple = fruit;
-        var emptySpaces = new Array();
+        };
+        //apple = fruit;
+        var emptySpaces = [];
 
 
         for (var i = minIndex(apple.x - 1); i <= apple.x + 1; i++)
@@ -65,28 +93,25 @@
     }
 
     function eatFruit(fruit, snake, xdir, ydir) {
-        if(snake[0].x+xdir==fruit.x&& snake[0].y+ydir==fruit.y){
+        if (getInBound(snake[0].x + xdir) == fruit.x && getInBound(snake[0].y + ydir) == fruit.y) {
             snake.unshift(fruit);
-            return true;
+            return false;
         }
-        return false;
-
+        return true;
     }
 
     function collisionCheck(snake) {
         var collision = false;
-        for (var i = 0; i < snake.length - 1; i++)
-            for (var j = i + 1; j < snake.length; j++) {
-                if (snake[i].x == snake[j].x && snake[i].y == snake[j].y) {
+            for (var j = 1; j < snake.length; j++) {
+                if (snake[0].x == snake[j].x && snake[0].y == snake[j].y) {
                     collision = true;
                     break;
                 }
-
             }
         return collision;
     }
 
-    function drawGrid(grid) {
+    function drawGrid(grid, ctx) {
         for (var i = 0; i < 20; i++)
             for (var j = 0; j < 20; j++) {
                 if (grid[i][j] == 1)
@@ -100,36 +125,92 @@
             }
     }
 
-    var xdir = 1;
-    var ydir = 0;
+
+
+
     var snake = new Array();
     var segment = {
         x: 10,
         y: 10
-    }
+    };
     snake.unshift(segment);
+    var isFruit = false;
     var fruit = {
         x: 10,
         y: 10
-    }
+    };
     var grid = new Array(20);
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
+    var canmove = true;
 
 
-    gridInit(grid);
+    setInterval(function () {
+        canmove = true;
 
-    if(collisionCheck(snake)){
-        //break;
-    }
-    drawSnake(grid, snake);
-    
-    fruit = newFruit(fruit, snake, grid, xdir, ydir);
-    moveSnake(snake, xdir, ydir);
-    drawFruit(grid, fruit);
-    drawGrid(grid);
+        gridInit(grid);
+        drawSnake(grid, snake);
 
-    console.log(collisionCheck(snake));
+        if (!isFruit) {
+            fruit = newFruit(snake, grid, xdir, ydir);
+            isFruit = true;
+        }
+        drawFruit(grid, fruit);
+        if (snake.length > 0)
+            if (!collisionCheck(snake))
+                moveSnake(snake, xdir, ydir);
+
+        document.onkeydown = function (event) {
+            keyCode = window.event.keyCode;
+            keyCode = event.keyCode;
+
+            switch (keyCode) {
+
+                case 37:
+                    if (xdir != 1 && canmove) {
+                        xdir = -1;
+                        ydir = 0;
+                        console.log('left');
+                        canmove = false;
+                    }
+                    break;
+
+                case 39:
+                    if (xdir != -1 && canmove) {
+                        xdir = 1;
+                        ydir = 0;
+                        console.log('right');
+                        canmove = false;
+                    }
+                    break;
+
+                case 38:
+                    if (ydir != 1 && canmove) {
+                        xdir = 0;
+                        ydir = -1;
+                        console.log('up');
+                        canmove = false;
+                    }
+                    break;
+
+                case 40:
+                    if (ydir != -1 && canmove) {
+                        xdir = 0;
+                        ydir = 1;
+                        console.log('down');
+                        canmove = false;
+                    }
+                    break;
+
+                case 32:
+                    moveSnake(snake, xdir, ydir);
+                    console.log(snake);
+            }
+        };
+        isFruit = eatFruit(fruit, snake, xdir, ydir);
+        drawGrid(grid, ctx);
+
+
+    }, 300);
+
 
 </script>
 
